@@ -32,5 +32,6 @@ string[,] keywords = new string[,]
 Note: The ```ParseName()``` method removes any non-letter character to avoid naming conflicts.
 
 * **Example:**
+
 ![](https://github.com/edatencio/Unity-Editor-Tools/blob/master/Screenshots/ScriptTemplate_Template.png)
 ![](https://github.com/edatencio/Unity-Editor-Tools/blob/master/Screenshots/ScriptTemplate_NewScript.png)
