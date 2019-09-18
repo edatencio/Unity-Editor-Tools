@@ -4,5 +4,20 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Example-Builder/Example-Builder 1.unity
+    guid: 92e9201cad4308f468bae5af28da52c2
+  - enabled: 1
+    path: Assets/Scenes/Example-Builder/Example-Builder 2.unity
+    guid: 9c0cca96a1750af4b95255c5fafee5f9
+  - enabled: 1
+    path: Assets/Scenes/Example-Builder/Example-Builder 3.unity
+    guid: 4300dce6abbba6e4293e57eb71332963
+  - enabled: 1
+    path: Assets/Scenes/Example-Builder/Example-Builder 4.unity
+    guid: ca6919864b4ce0748b8683d086cd4ffa
+  - enabled: 1
+    path: Assets/Scenes/Example-Builder/Example-Builder 5.unity
+    guid: bee9abef23ea1364093f441891b4e026
   m_configObjects: {}
