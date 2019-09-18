@@ -3,24 +3,26 @@
 * Created on: 17/06/19 (dd/mm/yy)
 */
 
-namespace UnityEditorTools
+namespace UnityEditorTools.Builder
 {
     using UnityEditor;
     using UnityEditor.Build.Reporting;
     using UnityEngine;
+
+#pragma warning disable CS0618 // Resolution dialog setting is obsolete
 
     public static class Builder
     {
         /*************************************************************************************************
         *** Variables
         *************************************************************************************************/
-        private const string name = "[Editor-Tools] Builder: ";
+        private const string name = "[Builder] ";
         private static readonly string projectPath = Application.dataPath.Replace("Assets", "");
 
         /*************************************************************************************************
         *** Build
         *************************************************************************************************/
-        private static BuildReport Build(string buildName, string buildPath, BuildTarget buildTarget, BuildOptions buildOptions)
+        private static BuildReport Build(string buildName, string buildPath, BuildTarget buildTarget, BuildOptions buildOptions, ResolutionDialogSetting resolutionDialogSetting)
         {
             // Get scenes to build
             string[] scenes = EditorBuildSettingsScene.GetActiveSceneList(EditorBuildSettings.scenes);
@@ -30,6 +32,8 @@ namespace UnityEditorTools
                 Debug.Log(string.Concat(name, "There are no scenes to build. Check your build settings!"));
                 return null;
             }
+
+            Debug.Log(string.Concat(name, "Building <", buildName, ">"));
 
             // Kill game task
             new System.Diagnostics.Process
@@ -45,7 +49,9 @@ namespace UnityEditorTools
             // Delete previous build
             FileUtil.DeleteFileOrDirectory(buildPath.Substring(0, buildPath.LastIndexOf('/')));
 
-            Debug.Log(string.Concat(name, "Building (", buildName, ")..."));
+            // Setup
+            ResolutionDialogSetting currentResolutionDialogSetting = PlayerSettings.displayResolutionDialog;
+            PlayerSettings.displayResolutionDialog = resolutionDialogSetting;
 
             // Build
             BuildReport result = BuildPipeline.BuildPlayer(scenes, buildPath, buildTarget, buildOptions);
@@ -59,23 +65,64 @@ namespace UnityEditorTools
                                     , "\nEnded at = ", result.summary.buildEndedAt
                                     ));
 
+            PlayerSettings.displayResolutionDialog = currentResolutionDialogSetting;
+
             return result;
+        }
+
+        /*************************************************************************************************
+        *** Open folder
+        *************************************************************************************************/
+        public static void OpenFolder()
+        {
+            Application.OpenURL(string.Concat(projectPath, "Builds/"));
         }
 
         /*************************************************************************************************
         *** Windows
         *************************************************************************************************/
-        [MenuItem("Build/Windows - Development Build _F5")]
-        private static void WindowsDevelopmentBuild()
+        public static void Production(Version version)
+        {
+            string buildPath = string.Concat(projectPath, "Builds/Production/");
+
+            const BuildTarget buildTarget = BuildTarget.StandaloneWindows; //x86
+            const BuildOptions buildOptions = BuildOptions.ShowBuiltPlayer;
+            const ResolutionDialogSetting resolutionDialogSetting = ResolutionDialogSetting.HiddenByDefault;
+
+            BuildReport buildReport = Build("Production (x86)", string.Concat(buildPath, PlayerSettings.productName, ".exe"), buildTarget, buildOptions, resolutionDialogSetting);
+
+            if (buildReport.summary.result == BuildResult.Succeeded)
+            {
+                string json = JsonUtility.ToJson(version, true);
+                System.IO.File.WriteAllText(string.Concat(buildPath, "Version.json"), json);
+            }
+        }
+
+        public static void Windows()
+        {
+            string buildPath = string.Concat(projectPath, "Builds/Windows/", PlayerSettings.productName, ".exe");
+
+            const BuildTarget buildTarget = BuildTarget.StandaloneWindows; //x86
+            const BuildOptions buildOptions = BuildOptions.ShowBuiltPlayer;
+            const ResolutionDialogSetting resolutionDialogSetting = ResolutionDialogSetting.HiddenByDefault;
+
+            Build("Windows (x86)", buildPath, buildTarget, buildOptions, resolutionDialogSetting);
+        }
+
+        public static void WindowsDevelopmentBuild()
         {
             string buildPath = string.Concat(projectPath, "Builds/Development Build/", PlayerSettings.productName, ".exe");
 
+            const BuildTarget buildTarget = BuildTarget.StandaloneWindows; //x86
             const BuildOptions buildOptions = BuildOptions.ShowBuiltPlayer
                                               | BuildOptions.AllowDebugging
                                               | BuildOptions.Development;
+            const ResolutionDialogSetting resolutionDialogSetting = ResolutionDialogSetting.Enabled;
 
-            Build("Windows - Development Build", buildPath, BuildTarget.StandaloneWindows, buildOptions);
+            Build("Windows (x86) [Development]", buildPath, buildTarget, buildOptions, resolutionDialogSetting);
         }
     }
+
+#pragma warning restore CS0618 // Type or member is obsolete
 }
 
