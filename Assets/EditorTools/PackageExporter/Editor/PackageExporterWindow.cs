@@ -18,9 +18,12 @@ namespace UnityEditorTools.PackageExporter
         *** Variables
         *************************************************************************************************/
         private static Vector2 scrollPosition;
+        private static Vector2 scrollPosition2;
         private static Action openBuildSettigns = () => EditorWindow.GetWindow(Type.GetType("UnityEditor.BuildPlayerWindow,UnityEditor"));
         private static Version version;
         private static bool once = false;
+
+        private static string readme;
 
         /*************************************************************************************************
         *** MenuItem
@@ -43,95 +46,112 @@ namespace UnityEditorTools.PackageExporter
                 // version object doesn't load and all the values are default to empty
                 version = new Version();
                 once = true;
+                readme = LoremIpsum.text;
             }
 
-            // Icon and version
-            GUILayout.Space(6f);
-            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.BeginVertical(/*GUILayout.Height(500f)*/);
             {
-                // Icon
-                EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-                TextureField("Icon", ref version.icon, EditorStyles.boldLabel);
-                EditorGUILayout.EndVertical();
-
-                // Version
-                EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Height(92f));
+                // Icon and version
+                GUILayout.Space(6f);
+                EditorGUILayout.BeginHorizontal();
                 {
-                    Label("Version", EditorStyles.boldLabel);
-                    FieldPlusMinus("Major", 40f, ref version.versionMajor, () => version.versionMajor++, () => version.versionMajor--);
-                    FieldPlusMinus("Minor", 40f, ref version.versionMinor, () => version.versionMinor++, () => version.versionMinor--);
-                }
-                EditorGUILayout.EndVertical();
-            }
-            EditorGUILayout.EndHorizontal();
+                    // Icon
+                    EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+                    TextureField("Icon", ref version.icon, EditorStyles.boldLabel);
+                    EditorGUILayout.EndVertical();
 
-            // Product and company names
-            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            {
-                Label("Product", EditorStyles.boldLabel);
-                Field("Product Name", 100f, ref version.productName);
-                Field("Company", 100f, ref version.companyName);
-            }
-            EditorGUILayout.EndVertical();
-
-            // Info
-            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            {
-                Label("Info", EditorStyles.boldLabel);
-                Label(string.Concat("Version: ", version.version), EditorStyles.helpBox);
-                Label(string.Concat("Product Name: ", version.productName), EditorStyles.helpBox);
-                Label(string.Concat("Company Name: ", version.companyName), EditorStyles.helpBox);
-                Label(string.Concat("Bundle Identifier: ", version.bundleIdentifier), EditorStyles.helpBox);
-            }
-            EditorGUILayout.EndVertical();
-
-            // Enabled scenes in build
-            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            {
-                Label("Enabled Scenes in Build", EditorStyles.boldLabel);
-
-                string[] scenes = EditorBuildSettingsScene.GetActiveSceneList(EditorBuildSettings.scenes);
-
-                GUILayoutOption[] options = null;
-
-                if (scenes.Length > 5)
-                    options = new GUILayoutOption[] { GUILayout.MaxHeight(94f) };
-
-                scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, EditorStyles.helpBox, options);
-                {
-                    for (int i = 0; i < scenes.Length; i++)
+                    // Version
+                    EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Height(92f));
                     {
-                        GUILayout.BeginHorizontal();
-                        GUILayout.Label(scenes[i].Replace("Assets/", ""));
-                        GUILayout.FlexibleSpace();
-                        GUILayout.Label(i.ToString());
-                        GUILayout.EndHorizontal();
+                        Label("Version", EditorStyles.boldLabel);
+                        FieldPlusMinus("Major", 40f, ref version.versionMajor, () => version.versionMajor++, () => version.versionMajor--);
+                        FieldPlusMinus("Minor", 40f, ref version.versionMinor, () => version.versionMinor++, () => version.versionMinor--);
                     }
+                    EditorGUILayout.EndVertical();
                 }
-                EditorGUILayout.EndScrollView();
+                EditorGUILayout.EndHorizontal();
+
+                // Product and company names
+                EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+                {
+                    Label("Package", EditorStyles.boldLabel);
+
+                    string packageName = "", packagePath = "";
+                    Field("Name", 100f, ref packageName);
+                    Field("Path", 100f, ref packagePath);
+                }
+                EditorGUILayout.EndVertical();
+
+                // Info
+                EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+                {
+                    Label("Info", EditorStyles.boldLabel);
+                    Label(string.Concat("Version: ", version.version), EditorStyles.helpBox);
+                    Label(string.Concat("Product Name: ", version.productName), EditorStyles.helpBox);
+                    Label(string.Concat("Company Name: ", version.companyName), EditorStyles.helpBox);
+                    Label(string.Concat("Bundle Identifier: ", version.bundleIdentifier), EditorStyles.helpBox);
+                }
+                EditorGUILayout.EndVertical();
+
+                // Files
+                EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+                {
+                    Label("Files", EditorStyles.boldLabel);
+
+                    string[] scenes = EditorBuildSettingsScene.GetActiveSceneList(EditorBuildSettings.scenes);
+
+                    GUILayoutOption[] options = null;
+
+                    if (scenes.Length >= 5)
+                        options = new GUILayoutOption[] { GUILayout.Height(94f) };
+
+                    GUILayout.BeginVertical(EditorStyles.helpBox, options);
+                    {
+                        scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+                        {
+                            for (int i = 0; i < scenes.Length; i++)
+                            {
+                                GUILayout.BeginHorizontal();
+                                GUILayout.Label(scenes[i].Replace("Assets/", ""));
+
+                                GUILayout.FlexibleSpace();
+                                GUILayout.Label(i.ToString());
+                                GUILayout.EndHorizontal();
+                            }
+                        }
+                        EditorGUILayout.EndScrollView();
+                    }
+                    GUILayout.EndVertical();
+                }
+                EditorGUILayout.EndVertical();
+
+                // Readme
+                EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+                {
+                    Label("Readme", EditorStyles.boldLabel);
+
+                    scrollPosition2 = EditorGUILayout.BeginScrollView(scrollPosition2);
+                    {
+                        readme = GUILayout.TextArea(readme/*, GUIStyle.none*/);
+                    }
+                    EditorGUILayout.EndScrollView();
+                }
+                EditorGUILayout.EndVertical();
+
+                // Export button
+                Button("Export Package", () => Debug.Log("Export"), height: 30f);
+
+                // Footer button
+                GUILayout.FlexibleSpace();
+                EditorGUILayout.BeginHorizontal();
+                {
+                    GUILayout.Space(4f);
+                    Button("Open Packages Folder", Builder.OpenFolder, 150f);
+                }
+                EditorGUILayout.EndHorizontal();
+                GUILayout.Space(8f);
             }
             EditorGUILayout.EndVertical();
-
-            // Build buttons
-            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            {
-                Label("Build", EditorStyles.boldLabel);
-                Button("Production (x86)", () => Builder.Production(version), height: 30f, color: Color.cyan);
-                Button("Windows (x86)", Builder.Windows, height: 30f);
-                Button("Windows Development (x86)", Builder.WindowsDevelopmentBuild, height: 30f);
-            }
-            EditorGUILayout.EndVertical();
-
-            // Footer buttons
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.BeginHorizontal();
-            {
-                GUILayout.Space(4f);
-                Button("Open Build Settings", openBuildSettigns, 125f);
-                Button("Open Builds Folder", Builder.OpenFolder, 125f);
-            }
-            EditorGUILayout.EndHorizontal();
-            GUILayout.Space(8f);
 
             // Save
             version.Save();
