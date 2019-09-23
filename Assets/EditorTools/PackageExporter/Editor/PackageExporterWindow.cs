@@ -10,7 +10,34 @@ namespace UnityEditorTools.PackageExporter
     using System;
     using System.Collections.Generic;
     using Builder;
-    using Version = Builder.Version;
+
+    public class Package
+    {
+        public string version;
+        public int versionMajor;
+        public int versionMinor;
+        public DefaultAsset folder;
+        public string name;
+        public string readme = @"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus eu scelerisque nisl. Curabitur cursus sit amet lorem vitae imperdiet.Aliquam fringilla commodo magna, id ornare lacus rutrum sed. Aliquam erat volutpat.Donec at quam justo. Nam consequat tellus nisi, eget pretium orci hendrerit et. Phasellus dignissim neque vel magna rutrum vehicula.In ac dolor ipsum. Aliquam leo justo, interdum et elit sed, iaculis scelerisque libero. Sed quis molestie lacus, ut eleifend felis. Ut commodo suscipit odio, vel condimentum ante. Ut egestas vel nisl in venenatis.Nunc rhoncus libero nec mauris pellentesque interdum.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Quisque id mattis velit.
+
+Proin tempus bibendum dolor, eu consectetur nisi egestas nec. Ut enim lectus, pulvinar auctor faucibus sed, fringilla eu nisi. Morbi commodo nibh augue, ac lobortis est auctor a. Mauris viverra luctus diam at vestibulum. Ut non gravida ex. Morbi imperdiet hendrerit efficitur. In posuere augue vitae bibendum luctus. Proin sollicitudin ullamcorper posuere. Sed suscipit suscipit consectetur.
+
+Aliquam ornare porttitor urna in laoreet.Morbi ipsum nunc, viverra non sollicitudin vel, porttitor et nibh. In ornare diam ipsum, sed maximus neque dictum ac. Nullam ultricies ipsum a varius molestie. Nullam nec sodales nisi. Vestibulum placerat ligula non tellus dignissim sollicitudin.Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed enim dui, consequat rhoncus tincidunt at, ullamcorper ut enim.
+
+Mauris dapibus non felis nec euismod. Fusce finibus nunc magna. Praesent scelerisque auctor sollicitudin. Maecenas lacinia, elit sit amet sollicitudin vulputate, tellus arcu facilisis metus, et varius est quam gravida turpis. In ultricies massa id turpis sodales porta finibus et nisi. Integer vitae finibus eros. Nullam ac ullamcorper ipsum, eget accumsan nunc. Integer sagittis erat sit amet luctus luctus.Quisque porttitor varius luctus. Pellentesque vehicula lacus sit amet condimentum lacinia.Praesent libero massa, feugiat quis orci eget, scelerisque scelerisque magna. Nunc diam metus, dignissim sed semper sit amet, fringilla euismod urna.Nam scelerisque elit in urna pharetra maximus.
+
+Nam fermentum, tortor eu pharetra condimentum, purus diam faucibus nibh, vitae euismod justo purus sit amet erat. Praesent eu est ornare, vehicula lorem at, tincidunt odio.Etiam efficitur imperdiet pretium. Mauris at convallis quam. Pellentesque nibh mi, euismod sit amet est non, faucibus ullamcorper velit.Sed semper efficitur tellus non fringilla. Morbi eu mauris pretium, volutpat enim eget, tempus nulla.Suspendisse mollis, neque quis auctor congue, eros urna porttitor ante, vitae fringilla lorem metus eu diam.Fusce placerat dapibus mi sit amet eleifend.Duis non purus porttitor, eleifend ante ut, tempor neque.Sed a arcu non ligula consequat tempor.Suspendisse malesuada leo sit amet placerat vestibulum.Ut ex velit, viverra ut libero quis, commodo interdum diam. Quisque gravida metus eu molestie tincidunt. Nam quis ornare ex, ut volutpat quam. In malesuada sodales massa, eu vestibulum diam placerat non.";
+
+        public Package()
+        {
+            SetVersion(versionMajor, versionMinor);
+        }
+
+        public void SetVersion(int major, int minor)
+        {
+            version = string.Concat(major, '.', minor);
+        }
+    }
 
     public class PackageExporterWindow : EditorWindow
     {
@@ -20,10 +47,9 @@ namespace UnityEditorTools.PackageExporter
         private static Vector2 scrollPosition;
         private static Vector2 scrollPosition2;
         private static Action openBuildSettigns = () => EditorWindow.GetWindow(Type.GetType("UnityEditor.BuildPlayerWindow,UnityEditor"));
-        private static Version version;
         private static bool once = false;
 
-        private static string readme;
+        public static Package package;
 
         /*************************************************************************************************
         *** MenuItem
@@ -44,84 +70,63 @@ namespace UnityEditorTools.PackageExporter
             {
                 // If the window is compiled while open, ShowWindow() doesn't execute and so the
                 // version object doesn't load and all the values are default to empty
-                version = new Version();
+                package = new Package();
                 once = true;
-                readme = LoremIpsum.text;
             }
 
             EditorGUILayout.BeginVertical(/*GUILayout.Height(500f)*/);
             {
-                // Icon and version
-                GUILayout.Space(6f);
-                EditorGUILayout.BeginHorizontal();
+                // Version
+                EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Height(61f));
                 {
-                    // Icon
-                    EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-                    TextureField("Icon", ref version.icon, EditorStyles.boldLabel);
-                    EditorGUILayout.EndVertical();
-
-                    // Version
-                    EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Height(92f));
-                    {
-                        Label("Version", EditorStyles.boldLabel);
-                        FieldPlusMinus("Major", 40f, ref version.versionMajor, () => version.versionMajor++, () => version.versionMajor--);
-                        FieldPlusMinus("Minor", 40f, ref version.versionMinor, () => version.versionMinor++, () => version.versionMinor--);
-                    }
-                    EditorGUILayout.EndVertical();
+                    Label("Version", EditorStyles.boldLabel);
+                    FieldPlusMinus("Major", 40f, ref package.versionMajor, () => package.versionMajor++, () => package.versionMajor--);
+                    FieldPlusMinus("Minor", 40f, ref package.versionMinor, () => package.versionMinor++, () => package.versionMinor--);
                 }
-                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.EndVertical();
 
-                // Product and company names
+                // Package
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 {
                     Label("Package", EditorStyles.boldLabel);
 
-                    string packageName = "", packagePath = "";
-                    Field("Name", 100f, ref packageName);
-                    Field("Path", 100f, ref packagePath);
-                }
-                EditorGUILayout.EndVertical();
-
-                // Info
-                EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-                {
-                    Label("Info", EditorStyles.boldLabel);
-                    Label(string.Concat("Version: ", version.version), EditorStyles.helpBox);
-                    Label(string.Concat("Product Name: ", version.productName), EditorStyles.helpBox);
-                    Label(string.Concat("Company Name: ", version.companyName), EditorStyles.helpBox);
-                    Label(string.Concat("Bundle Identifier: ", version.bundleIdentifier), EditorStyles.helpBox);
-                }
-                EditorGUILayout.EndVertical();
-
-                // Files
-                EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-                {
-                    Label("Files", EditorStyles.boldLabel);
-
-                    string[] scenes = EditorBuildSettingsScene.GetActiveSceneList(EditorBuildSettings.scenes);
-
-                    GUILayoutOption[] options = null;
-
-                    if (scenes.Length >= 5)
-                        options = new GUILayoutOption[] { GUILayout.Height(94f) };
-
-                    GUILayout.BeginVertical(EditorStyles.helpBox, options);
+                    EditorGUILayout.BeginVertical();
                     {
-                        scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+                        EditorGUILayout.BeginHorizontal();
                         {
-                            for (int i = 0; i < scenes.Length; i++)
-                            {
-                                GUILayout.BeginHorizontal();
-                                GUILayout.Label(scenes[i].Replace("Assets/", ""));
+                            GUILayout.Label("Folder", GUILayout.Width(40f));
 
-                                GUILayout.FlexibleSpace();
-                                GUILayout.Label(i.ToString());
-                                GUILayout.EndHorizontal();
+                            package.folder = EditorGUILayout.ObjectField("", package.folder, typeof(DefaultAsset), false) as DefaultAsset;
+
+                            if (package.folder != null)
+                            {
+                                if (!AssetDatabase.IsValidFolder(AssetDatabase.GetAssetPath(package.folder)))
+                                {
+                                    package.folder = null;
+                                    Debug.LogError(string.Concat(name, "Not a valid folder!"));
+                                }
+                                else
+                                {
+                                    if (string.IsNullOrEmpty(package.name))
+                                        package.name = package.folder.name;
+                                }
                             }
                         }
-                        EditorGUILayout.EndScrollView();
+                        EditorGUILayout.EndHorizontal();
+                        GUILayout.Space(1f);
                     }
-                    GUILayout.EndVertical();
+                    EditorGUILayout.EndVertical();
+
+                    Field("Name", 40f, ref package.name);
+                }
+                EditorGUILayout.EndVertical();
+
+                // Summary
+                EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+                {
+                    Label("Summary", EditorStyles.boldLabel);
+                    Label(string.Concat("Version: ", package.version), EditorStyles.helpBox);
+                    Label(string.Concat("Package Name: ", package.name), EditorStyles.helpBox);
                 }
                 EditorGUILayout.EndVertical();
 
@@ -132,14 +137,14 @@ namespace UnityEditorTools.PackageExporter
 
                     scrollPosition2 = EditorGUILayout.BeginScrollView(scrollPosition2);
                     {
-                        readme = GUILayout.TextArea(readme/*, GUIStyle.none*/);
+                        package.readme = GUILayout.TextArea(package.readme);
                     }
                     EditorGUILayout.EndScrollView();
                 }
                 EditorGUILayout.EndVertical();
 
                 // Export button
-                Button("Export Package", () => Debug.Log("Export"), height: 30f);
+                Button("Export Package", () => PackageExporter.Export(package), height: 30f);
 
                 // Footer button
                 GUILayout.FlexibleSpace();
@@ -154,7 +159,7 @@ namespace UnityEditorTools.PackageExporter
             EditorGUILayout.EndVertical();
 
             // Save
-            version.Save();
+            //package.Save();
         }
 
         /*************************************************************************************************
