@@ -47,7 +47,12 @@ namespace UnityEditorTools.PackageExporter
 
             AssetDatabase.ImportAsset(readmePath);
 
-            string exportPath = Application.dataPath.Replace("Assets", string.Concat("Builds/Package Exporter/", package.name, ".unitypackage"));
+            string exportPath = string.Concat(Application.dataPath.Replace("Assets", "")
+                                              , "Builds/Package Exporter/"
+                                              , package.name
+                                              , " v", package.Version
+                                              , ".unitypackage");
+
             const ExportPackageOptions exportOptions = ExportPackageOptions.Recurse | ExportPackageOptions.Interactive;
 
             Directory.CreateDirectory(exportPath.Substring(0, exportPath.LastIndexOf('/')));
