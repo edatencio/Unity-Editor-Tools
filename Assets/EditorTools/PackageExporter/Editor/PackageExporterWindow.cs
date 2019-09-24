@@ -142,24 +142,6 @@ namespace UnityEditorTools.PackageExporter
         /*************************************************************************************************
         *** Methods
         *************************************************************************************************/
-        private static void TextureField(string name, ref Texture2D texture, GUIStyle labelStyle)
-        {
-            EditorGUILayout.BeginHorizontal();
-            {
-                GUILayout.Space(1f);
-                GUILayout.BeginVertical();
-                {
-                    GUILayout.Space(0f);
-                    GUILayout.Label(name, labelStyle);
-                    texture = EditorGUILayout.ObjectField(texture, typeof(Texture2D), false, GUILayout.Width(64), GUILayout.Height(64)) as Texture2D;
-                    GUILayout.Space(2f);
-                }
-                GUILayout.EndVertical();
-                GUILayout.Space(1f);
-            }
-            EditorGUILayout.EndHorizontal();
-        }
-
         private static void Field(string name, float labelWidth, ref string value)
         {
             EditorGUILayout.BeginVertical();

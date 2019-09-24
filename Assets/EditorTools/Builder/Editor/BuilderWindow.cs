@@ -72,10 +72,10 @@ namespace UnityEditorTools.Builder
             }
             EditorGUILayout.EndVertical();
 
-            // Info
+            // Summary
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             {
-                Label("Info", EditorStyles.boldLabel);
+                Label("Summary", EditorStyles.boldLabel);
                 Label(string.Concat("Version: ", version.version), EditorStyles.helpBox);
                 Label(string.Concat("Product Name: ", version.productName), EditorStyles.helpBox);
                 Label(string.Concat("Company Name: ", version.companyName), EditorStyles.helpBox);
@@ -156,31 +156,6 @@ namespace UnityEditorTools.Builder
             EditorGUILayout.EndHorizontal();
         }
 
-        private static void Box(params string[] value)
-        {
-            string text = "";
-
-            for (int i = 0; i < value.Length; i++)
-                text += value[i];
-
-            GUILayout.Box(text);
-        }
-
-        private static void Field(string name, ref string value)
-        {
-            EditorGUILayout.BeginVertical();
-            {
-                EditorGUILayout.BeginHorizontal();
-                {
-                    GUILayout.Label(name);
-                    value = GUILayout.TextField(value);
-                }
-                EditorGUILayout.EndHorizontal();
-                GUILayout.Space(1f);
-            }
-            EditorGUILayout.EndVertical();
-        }
-
         private static void Field(string name, float labelWidth, ref string value)
         {
             EditorGUILayout.BeginVertical();
@@ -200,12 +175,6 @@ namespace UnityEditorTools.Builder
         {
             GUILayout.Space(0f);
             GUILayout.Label(name, style ?? EditorStyles.label);
-        }
-
-        private static void Label(string name, float width, GUIStyle style = null)
-        {
-            GUILayout.Space(0f);
-            GUILayout.Label(name, style ?? EditorStyles.label, GUILayout.Width(width));
         }
 
         private static void FieldPlusMinus(string name, float? labelWidth, ref int value, Action plusAction, Action minusAction)
