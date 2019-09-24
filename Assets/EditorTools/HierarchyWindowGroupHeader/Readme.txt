@@ -1,5 +1,8 @@
+###-
 # Name = HierarchyWindowGroupHeader
-# Version = 0.0
+# Version = 100.01
+# Author = Edward Atencio
+###~
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus eu scelerisque nisl. Curabitur cursus sit amet lorem vitae imperdiet.Aliquam fringilla commodo magna, id ornare lacus rutrum sed. Aliquam erat volutpat.Donec at quam justo. Nam consequat tellus nisi, eget pretium orci hendrerit et. Phasellus dignissim neque vel magna rutrum vehicula.In ac dolor ipsum. Aliquam leo justo, interdum et elit sed, iaculis scelerisque libero. Sed quis molestie lacus, ut eleifend felis. Ut commodo suscipit odio, vel condimentum ante. Ut egestas vel nisl in venenatis.Nunc rhoncus libero nec mauris pellentesque interdum.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Quisque id mattis velit.
 

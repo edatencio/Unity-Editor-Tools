@@ -13,7 +13,13 @@ namespace UnityEditorTools.PackageExporter
     {
         private const string name = "[Package Exporter] ";
 
-        public static void Export(Package package)
+        private const string openToken = "###-";
+        private const string closeToken = "###~";
+        private const string authorKey = "# Author";
+        private const string nameKey = "# Name";
+        private const string versionKey = "# Version";
+
+        public static void Export(PackageInfo package)
         {
             if (package == null)
             {
@@ -23,13 +29,12 @@ namespace UnityEditorTools.PackageExporter
 
             string readmePath = AssetDatabase.GetAssetPath(package.folder) + "/Readme.txt";
 
-            string readmeContent = string.Concat("# Name = "
-                                                 , package.name
-                                                 , "\n# Version = "
-                                                 , package.version
-                                                 , "\n\n"
-                                                 , package.readme
-                                                 );
+            string readmeContent = string.Concat(openToken
+                                                 , "\n", authorKey, " = ", package.author
+                                                 , "\n", nameKey, " = ", package.name
+                                                 , "\n", versionKey, " = ", package.Version
+                                                 , "\n", closeToken, "\n\n"
+                                                 , package.readme);
 
             try
             {
@@ -49,22 +54,49 @@ namespace UnityEditorTools.PackageExporter
             AssetDatabase.ExportPackage(AssetDatabase.GetAssetPath(package.folder), exportPath, exportOptions);
         }
 
-        public static string GetReadme(DefaultAsset folder)
+        public static PackageInfo GetPackageInfo(DefaultAsset folder)
         {
             string readmePath = AssetDatabase.GetAssetPath(folder) + "/Readme.txt";
+            PackageInfo package = new PackageInfo() { folder = folder };
 
             if (!File.Exists(readmePath))
-                return null;
+                return package;
 
+            bool headerFinished = false;
             try
             {
-                return File.ReadAllText(readmePath);
+                foreach (string line in File.ReadAllLines(readmePath))
+                {
+                    if (!headerFinished)
+                    {
+                        if (string.CompareOrdinal(line, 0, authorKey, 0, authorKey.Length) == 0)
+                            package.author = line.Substring(authorKey.Length + 3);
+
+                        if (string.CompareOrdinal(line, 0, nameKey, 0, nameKey.Length) == 0)
+                            package.name = line.Substring(nameKey.Length + 3);
+
+                        if (string.CompareOrdinal(line, 0, versionKey, 0, versionKey.Length) == 0)
+                            package.SetVersion(line.Substring(versionKey.Length + 3));
+
+                        if (string.CompareOrdinal(line, 0, closeToken, 0, closeToken.Length) == 0)
+                            headerFinished = true;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(line))
+                            package.readme += line;
+
+                        if (string.IsNullOrEmpty(line) && !string.IsNullOrEmpty(package.readme))
+                            package.readme += "\n\n";
+                    }
+                }
             }
             catch (System.Exception e)
             {
                 Debug.LogError(e);
-                return null;
             }
+
+            return package;
         }
     }
 }

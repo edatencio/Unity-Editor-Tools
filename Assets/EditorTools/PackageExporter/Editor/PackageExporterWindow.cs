@@ -9,35 +9,6 @@ namespace UnityEditorTools.PackageExporter
     using UnityEditor;
     using System;
     using System.Collections.Generic;
-    using Builder;
-
-    public class Package
-    {
-        public string version;
-        public int versionMajor;
-        public int versionMinor;
-        public DefaultAsset folder;
-        public string name;
-        public string readme = @"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus eu scelerisque nisl. Curabitur cursus sit amet lorem vitae imperdiet.Aliquam fringilla commodo magna, id ornare lacus rutrum sed. Aliquam erat volutpat.Donec at quam justo. Nam consequat tellus nisi, eget pretium orci hendrerit et. Phasellus dignissim neque vel magna rutrum vehicula.In ac dolor ipsum. Aliquam leo justo, interdum et elit sed, iaculis scelerisque libero. Sed quis molestie lacus, ut eleifend felis. Ut commodo suscipit odio, vel condimentum ante. Ut egestas vel nisl in venenatis.Nunc rhoncus libero nec mauris pellentesque interdum.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Quisque id mattis velit.
-
-Proin tempus bibendum dolor, eu consectetur nisi egestas nec. Ut enim lectus, pulvinar auctor faucibus sed, fringilla eu nisi. Morbi commodo nibh augue, ac lobortis est auctor a. Mauris viverra luctus diam at vestibulum. Ut non gravida ex. Morbi imperdiet hendrerit efficitur. In posuere augue vitae bibendum luctus. Proin sollicitudin ullamcorper posuere. Sed suscipit suscipit consectetur.
-
-Aliquam ornare porttitor urna in laoreet.Morbi ipsum nunc, viverra non sollicitudin vel, porttitor et nibh. In ornare diam ipsum, sed maximus neque dictum ac. Nullam ultricies ipsum a varius molestie. Nullam nec sodales nisi. Vestibulum placerat ligula non tellus dignissim sollicitudin.Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed enim dui, consequat rhoncus tincidunt at, ullamcorper ut enim.
-
-Mauris dapibus non felis nec euismod. Fusce finibus nunc magna. Praesent scelerisque auctor sollicitudin. Maecenas lacinia, elit sit amet sollicitudin vulputate, tellus arcu facilisis metus, et varius est quam gravida turpis. In ultricies massa id turpis sodales porta finibus et nisi. Integer vitae finibus eros. Nullam ac ullamcorper ipsum, eget accumsan nunc. Integer sagittis erat sit amet luctus luctus.Quisque porttitor varius luctus. Pellentesque vehicula lacus sit amet condimentum lacinia.Praesent libero massa, feugiat quis orci eget, scelerisque scelerisque magna. Nunc diam metus, dignissim sed semper sit amet, fringilla euismod urna.Nam scelerisque elit in urna pharetra maximus.
-
-Nam fermentum, tortor eu pharetra condimentum, purus diam faucibus nibh, vitae euismod justo purus sit amet erat. Praesent eu est ornare, vehicula lorem at, tincidunt odio.Etiam efficitur imperdiet pretium. Mauris at convallis quam. Pellentesque nibh mi, euismod sit amet est non, faucibus ullamcorper velit.Sed semper efficitur tellus non fringilla. Morbi eu mauris pretium, volutpat enim eget, tempus nulla.Suspendisse mollis, neque quis auctor congue, eros urna porttitor ante, vitae fringilla lorem metus eu diam.Fusce placerat dapibus mi sit amet eleifend.Duis non purus porttitor, eleifend ante ut, tempor neque.Sed a arcu non ligula consequat tempor.Suspendisse malesuada leo sit amet placerat vestibulum.Ut ex velit, viverra ut libero quis, commodo interdum diam. Quisque gravida metus eu molestie tincidunt. Nam quis ornare ex, ut volutpat quam. In malesuada sodales massa, eu vestibulum diam placerat non.";
-
-        public Package()
-        {
-            SetVersion(versionMajor, versionMinor);
-        }
-
-        public void SetVersion(int major, int minor)
-        {
-            version = string.Concat(major, '.', minor);
-        }
-    }
 
     public class PackageExporterWindow : EditorWindow
     {
@@ -48,8 +19,9 @@ Nam fermentum, tortor eu pharetra condimentum, purus diam faucibus nibh, vitae e
         private static Vector2 scrollPosition2;
         private static Action openBuildSettigns = () => EditorWindow.GetWindow(Type.GetType("UnityEditor.BuildPlayerWindow,UnityEditor"));
         private static bool once = false;
-
-        public static Package package;
+        public static PackageInfo packageInfo;
+        public static DefaultAsset folder;
+        public static DefaultAsset currentFolder;
 
         /*************************************************************************************************
         *** MenuItem
@@ -58,6 +30,8 @@ Nam fermentum, tortor eu pharetra condimentum, purus diam faucibus nibh, vitae e
         public static void ShowWindow()
         {
             once = false;
+            folder = null;
+            currentFolder = null;
             GetWindow<PackageExporterWindow>(false, "Package Exporter", true);
         }
 
@@ -68,23 +42,12 @@ Nam fermentum, tortor eu pharetra condimentum, purus diam faucibus nibh, vitae e
         {
             if (!once)
             {
-                // If the window is compiled while open, ShowWindow() doesn't execute and so the
-                // version object doesn't load and all the values are default to empty
-                package = new Package();
+                packageInfo = new PackageInfo();
                 once = true;
             }
 
-            EditorGUILayout.BeginVertical(/*GUILayout.Height(500f)*/);
+            EditorGUILayout.BeginVertical();
             {
-                // Version
-                EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Height(61f));
-                {
-                    Label("Version", EditorStyles.boldLabel);
-                    FieldPlusMinus("Major", 40f, ref package.versionMajor, () => package.versionMajor++, () => package.versionMajor--);
-                    FieldPlusMinus("Minor", 40f, ref package.versionMinor, () => package.versionMinor++, () => package.versionMinor--);
-                }
-                EditorGUILayout.EndVertical();
-
                 // Package
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 {
@@ -96,19 +59,25 @@ Nam fermentum, tortor eu pharetra condimentum, purus diam faucibus nibh, vitae e
                         {
                             GUILayout.Label("Folder", GUILayout.Width(40f));
 
-                            package.folder = EditorGUILayout.ObjectField("", package.folder, typeof(DefaultAsset), false) as DefaultAsset;
+                            folder = EditorGUILayout.ObjectField("", folder, typeof(DefaultAsset), false) as DefaultAsset;
 
-                            if (package.folder != null)
+                            if (folder != null)
                             {
-                                if (!AssetDatabase.IsValidFolder(AssetDatabase.GetAssetPath(package.folder)))
+                                if (!AssetDatabase.IsValidFolder(AssetDatabase.GetAssetPath(folder)))
                                 {
-                                    package.folder = null;
+                                    folder = null;
                                     Debug.LogError(string.Concat(name, "Not a valid folder!"));
                                 }
                                 else
                                 {
-                                    if (string.IsNullOrEmpty(package.name))
-                                        package.name = package.folder.name;
+                                    if (currentFolder != folder)
+                                    {
+                                        currentFolder = folder;
+                                        packageInfo = PackageExporter.GetPackageInfo(folder);
+                                    }
+
+                                    if (string.IsNullOrEmpty(packageInfo.name))
+                                        packageInfo.name = packageInfo.folder.name;
                                 }
                             }
                         }
@@ -117,7 +86,17 @@ Nam fermentum, tortor eu pharetra condimentum, purus diam faucibus nibh, vitae e
                     }
                     EditorGUILayout.EndVertical();
 
-                    Field("Name", 40f, ref package.name);
+                    Field("Name", 40f, ref packageInfo.name);
+                    Field("Author", 40f, ref packageInfo.author);
+                }
+                EditorGUILayout.EndVertical();
+
+                // Version
+                EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Height(61f));
+                {
+                    Label("Version", EditorStyles.boldLabel);
+                    FieldPlusMinus("Major", 40f, ref packageInfo.versionMajor, () => packageInfo.versionMajor++, () => packageInfo.versionMajor--);
+                    FieldPlusMinus("Minor", 40f, ref packageInfo.versionMinor, () => packageInfo.versionMinor++, () => packageInfo.versionMinor--);
                 }
                 EditorGUILayout.EndVertical();
 
@@ -125,8 +104,9 @@ Nam fermentum, tortor eu pharetra condimentum, purus diam faucibus nibh, vitae e
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 {
                     Label("Summary", EditorStyles.boldLabel);
-                    Label(string.Concat("Version: ", package.version), EditorStyles.helpBox);
-                    Label(string.Concat("Package Name: ", package.name), EditorStyles.helpBox);
+                    Label(string.Concat("Version: ", packageInfo.Version), EditorStyles.helpBox);
+                    Label(string.Concat("Package Name: ", packageInfo.name), EditorStyles.helpBox);
+                    Label(string.Concat("Author: ", packageInfo.author), EditorStyles.helpBox);
                 }
                 EditorGUILayout.EndVertical();
 
@@ -137,29 +117,26 @@ Nam fermentum, tortor eu pharetra condimentum, purus diam faucibus nibh, vitae e
 
                     scrollPosition2 = EditorGUILayout.BeginScrollView(scrollPosition2);
                     {
-                        package.readme = GUILayout.TextArea(package.readme);
+                        packageInfo.readme = GUILayout.TextArea(packageInfo.readme);
                     }
                     EditorGUILayout.EndScrollView();
                 }
                 EditorGUILayout.EndVertical();
 
                 // Export button
-                Button("Export Package", () => PackageExporter.Export(package), height: 30f);
+                Button("Export Package", () => PackageExporter.Export(packageInfo), height: 30f);
 
                 // Footer button
                 GUILayout.FlexibleSpace();
                 EditorGUILayout.BeginHorizontal();
                 {
                     GUILayout.Space(4f);
-                    Button("Open Packages Folder", Builder.OpenFolder, 150f);
+                    Button("Open Packages Folder", Builder.Builder.OpenFolder, 150f);
                 }
                 EditorGUILayout.EndHorizontal();
                 GUILayout.Space(8f);
             }
             EditorGUILayout.EndVertical();
-
-            // Save
-            //package.Save();
         }
 
         /*************************************************************************************************
@@ -183,31 +160,6 @@ Nam fermentum, tortor eu pharetra condimentum, purus diam faucibus nibh, vitae e
             EditorGUILayout.EndHorizontal();
         }
 
-        private static void Box(params string[] value)
-        {
-            string text = "";
-
-            for (int i = 0; i < value.Length; i++)
-                text += value[i];
-
-            GUILayout.Box(text);
-        }
-
-        private static void Field(string name, ref string value)
-        {
-            EditorGUILayout.BeginVertical();
-            {
-                EditorGUILayout.BeginHorizontal();
-                {
-                    GUILayout.Label(name);
-                    value = GUILayout.TextField(value);
-                }
-                EditorGUILayout.EndHorizontal();
-                GUILayout.Space(1f);
-            }
-            EditorGUILayout.EndVertical();
-        }
-
         private static void Field(string name, float labelWidth, ref string value)
         {
             EditorGUILayout.BeginVertical();
@@ -227,12 +179,6 @@ Nam fermentum, tortor eu pharetra condimentum, purus diam faucibus nibh, vitae e
         {
             GUILayout.Space(0f);
             GUILayout.Label(name, style ?? EditorStyles.label);
-        }
-
-        private static void Label(string name, float width, GUIStyle style = null)
-        {
-            GUILayout.Space(0f);
-            GUILayout.Label(name, style ?? EditorStyles.label, GUILayout.Width(width));
         }
 
         private static void FieldPlusMinus(string name, float? labelWidth, ref int value, Action plusAction, Action minusAction)
