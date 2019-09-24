@@ -48,7 +48,7 @@ namespace UnityEditorTools.Builder
             EditorGUILayout.BeginHorizontal();
             {
                 // Icon
-                EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+                EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Width(1f));
                 TextureField("Icon", ref version.icon, EditorStyles.boldLabel);
                 EditorGUILayout.EndVertical();
 
@@ -95,18 +95,22 @@ namespace UnityEditorTools.Builder
                 if (scenes.Length > 5)
                     options = new GUILayoutOption[] { GUILayout.MaxHeight(94f) };
 
-                scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, EditorStyles.helpBox, options);
+                GUILayout.BeginVertical(EditorStyles.helpBox, options);
                 {
-                    for (int i = 0; i < scenes.Length; i++)
+                    scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
                     {
-                        GUILayout.BeginHorizontal();
-                        GUILayout.Label(scenes[i].Replace("Assets/", ""));
-                        GUILayout.FlexibleSpace();
-                        GUILayout.Label(i.ToString());
-                        GUILayout.EndHorizontal();
+                        for (int i = 0; i < scenes.Length; i++)
+                        {
+                            GUILayout.BeginHorizontal();
+                            GUILayout.Label(scenes[i].Replace("Assets/", ""));
+                            GUILayout.FlexibleSpace();
+                            GUILayout.Label(i.ToString());
+                            GUILayout.EndHorizontal();
+                        }
                     }
+                    EditorGUILayout.EndScrollView();
                 }
-                EditorGUILayout.EndScrollView();
+                GUILayout.EndVertical();
             }
             EditorGUILayout.EndVertical();
 
