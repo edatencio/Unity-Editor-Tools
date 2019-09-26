@@ -19,6 +19,9 @@ namespace UnityEditorTools.PackageExporter
         private const string nameKey = "# Name";
         private const string versionKey = "# Version";
 
+        public static readonly string exportPath = string.Concat(Application.dataPath.Remove(Application.dataPath.Length - 6)
+                                                                 , "Builds/Package Exporter/");
+
         public static void Export(PackageInfo package)
         {
             if (package == null)
@@ -46,17 +49,16 @@ namespace UnityEditorTools.PackageExporter
             }
 
             AssetDatabase.ImportAsset(readmePath);
+            Directory.CreateDirectory(exportPath);
 
-            string exportPath = string.Concat(Application.dataPath.Replace("Assets", "")
-                                              , "Builds/Package Exporter/"
+            string packagePath = string.Concat(exportPath
                                               , package.name
                                               , " v", package.Version
                                               , ".unitypackage");
 
             const ExportPackageOptions exportOptions = ExportPackageOptions.Recurse | ExportPackageOptions.Interactive;
 
-            Directory.CreateDirectory(exportPath.Substring(0, exportPath.LastIndexOf('/')));
-            AssetDatabase.ExportPackage(AssetDatabase.GetAssetPath(package.folder), exportPath, exportOptions);
+            AssetDatabase.ExportPackage(AssetDatabase.GetAssetPath(package.folder), packagePath, exportOptions);
         }
 
         public static PackageInfo GetPackageInfo(DefaultAsset folder)
@@ -104,6 +106,12 @@ namespace UnityEditorTools.PackageExporter
             }
 
             return package;
+        }
+
+        public static void OpenFolder()
+        {
+            Directory.CreateDirectory(exportPath);
+            Application.OpenURL(exportPath);
         }
     }
 }

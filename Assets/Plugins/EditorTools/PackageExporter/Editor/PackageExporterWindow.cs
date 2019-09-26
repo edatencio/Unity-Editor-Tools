@@ -131,7 +131,7 @@ namespace UnityEditorTools.PackageExporter
                 EditorGUILayout.BeginHorizontal();
                 {
                     GUILayout.Space(4f);
-                    Button("Open Packages Folder", Builder.Builder.OpenFolder, 150f);
+                    Button("Open Packages Folder", PackageExporter.OpenFolder, 150f);
                 }
                 EditorGUILayout.EndHorizontal();
                 GUILayout.Space(8f);
