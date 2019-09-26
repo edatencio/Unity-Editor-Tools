@@ -98,7 +98,8 @@ namespace UnityEditorTools.PackageExporter
                     }
                 }
 
-                package.readme = package.readme.TrimEnd('\n');
+                if (!string.IsNullOrEmpty(package.readme))
+                    package.readme = package.readme.TrimEnd('\n');
             }
             catch (System.Exception e)
             {

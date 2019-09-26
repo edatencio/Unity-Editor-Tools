@@ -115,7 +115,7 @@ namespace UnityEditorTools.PackageExporter
 
                     scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
                     {
-                        packageInfo.readme = GUILayout.TextArea(packageInfo.readme);
+                        packageInfo.readme = EditorGUILayout.TextArea(packageInfo.readme);
                     }
                     EditorGUILayout.EndScrollView();
                 }
