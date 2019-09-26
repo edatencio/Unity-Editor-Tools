@@ -17,7 +17,7 @@ namespace UnityEditorTools.Builder
         *** Variables
         *************************************************************************************************/
         private const string name = "[Builder] ";
-        private static readonly string projectPath = Application.dataPath.Replace("Assets", "");
+        private static readonly string buildsPath = string.Concat(Application.dataPath.Remove(Application.dataPath.Length - 6), "Builds/");
 
         /*************************************************************************************************
         *** Build
@@ -75,7 +75,8 @@ namespace UnityEditorTools.Builder
         *************************************************************************************************/
         public static void OpenFolder()
         {
-            Application.OpenURL(string.Concat(projectPath, "Builds/"));
+            System.IO.Directory.CreateDirectory(buildsPath);
+            Application.OpenURL(buildsPath);
         }
 
         /*************************************************************************************************
@@ -83,7 +84,7 @@ namespace UnityEditorTools.Builder
         *************************************************************************************************/
         public static void Production(Version version)
         {
-            string buildPath = string.Concat(projectPath, "Builds/Production/");
+            string buildPath = string.Concat(buildsPath, "Production/");
 
             const BuildTarget buildTarget = BuildTarget.StandaloneWindows; //x86
             const BuildOptions buildOptions = BuildOptions.ShowBuiltPlayer;
@@ -100,7 +101,7 @@ namespace UnityEditorTools.Builder
 
         public static void Windows()
         {
-            string buildPath = string.Concat(projectPath, "Builds/Windows/", PlayerSettings.productName, ".exe");
+            string buildPath = string.Concat(buildsPath, "Windows/", PlayerSettings.productName, ".exe");
 
             const BuildTarget buildTarget = BuildTarget.StandaloneWindows; //x86
             const BuildOptions buildOptions = BuildOptions.ShowBuiltPlayer;
@@ -111,7 +112,7 @@ namespace UnityEditorTools.Builder
 
         public static void WindowsDevelopmentBuild()
         {
-            string buildPath = string.Concat(projectPath, "Builds/Development Build/", PlayerSettings.productName, ".exe");
+            string buildPath = string.Concat(buildsPath, "Development Build/", PlayerSettings.productName, ".exe");
 
             const BuildTarget buildTarget = BuildTarget.StandaloneWindows; //x86
             const BuildOptions buildOptions = BuildOptions.ShowBuiltPlayer
