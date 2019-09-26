@@ -89,12 +89,14 @@ namespace UnityEditorTools.PackageExporter
                     else
                     {
                         if (!string.IsNullOrEmpty(line))
-                            package.readme += line;
+                            package.readme += string.Concat(line, '\n');
 
                         if (string.IsNullOrEmpty(line) && !string.IsNullOrEmpty(package.readme))
                             package.readme += "\n\n";
                     }
                 }
+
+                package.readme = package.readme.TrimEnd('\n');
             }
             catch (System.Exception e)
             {
