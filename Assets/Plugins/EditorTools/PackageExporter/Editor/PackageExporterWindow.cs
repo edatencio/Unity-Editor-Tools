@@ -16,8 +16,6 @@ namespace UnityEditorTools.PackageExporter
         *** Variables
         *************************************************************************************************/
         private static Vector2 scrollPosition;
-        private static Vector2 scrollPosition2;
-        private static Action openBuildSettigns = () => EditorWindow.GetWindow(Type.GetType("UnityEditor.BuildPlayerWindow,UnityEditor"));
         private static bool once = false;
         public static PackageInfo packageInfo;
         public static DefaultAsset folder;
@@ -115,7 +113,7 @@ namespace UnityEditorTools.PackageExporter
                 {
                     Label("Readme", EditorStyles.boldLabel);
 
-                    scrollPosition2 = EditorGUILayout.BeginScrollView(scrollPosition2);
+                    scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
                     {
                         packageInfo.readme = GUILayout.TextArea(packageInfo.readme);
                     }
