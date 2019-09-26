@@ -1,7 +1,7 @@
 ###-
 # Author = Edward Atencio
 # Name = PackageExporter
-# Version = 1.0
+# Version = 1.1
 ###~
 
 # How to open:
