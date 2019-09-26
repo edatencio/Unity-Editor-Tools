@@ -115,7 +115,7 @@ namespace UnityEditorTools.PackageExporter
 
                     scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
                     {
-                        packageInfo.readme = EditorGUILayout.TextArea(packageInfo.readme);
+                        packageInfo.readme = EditorGUILayout.TextArea(packageInfo.readme, new GUIStyle(EditorStyles.textField) { wordWrap = true });
                     }
                     EditorGUILayout.EndScrollView();
                 }
