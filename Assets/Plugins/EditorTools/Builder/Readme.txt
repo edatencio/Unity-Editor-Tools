@@ -7,3 +7,6 @@
 # How to open:
 Tools -> Buider
 Or press F5
+
+# Source
+https://github.com/edatencio/Unity-Editor-Tools
