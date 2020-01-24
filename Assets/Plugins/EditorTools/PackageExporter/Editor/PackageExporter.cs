@@ -33,9 +33,9 @@ namespace UnityEditorTools.PackageExporter
             string readmePath = AssetDatabase.GetAssetPath(package.folder) + "/Readme.txt";
 
             string readmeContent = string.Concat(openToken
-                                                 , "\n", authorKey, " = ", package.author
                                                  , "\n", nameKey, " = ", package.name
                                                  , "\n", versionKey, " = ", package.Version
+                                                 , "\n", authorKey, " = ", package.author
                                                  , "\n", closeToken, "\n\n"
                                                  , package.readme);
 
