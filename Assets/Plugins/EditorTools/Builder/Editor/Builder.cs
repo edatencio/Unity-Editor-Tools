@@ -8,6 +8,7 @@ namespace UnityEditorTools.Builder
     using UnityEditor;
     using UnityEditor.Build.Reporting;
     using UnityEngine;
+    using System.Collections.Generic;
 
 #pragma warning disable CS0618 // Resolution dialog setting is obsolete
 
@@ -19,15 +20,28 @@ namespace UnityEditorTools.Builder
         private const string name = "[Builder] ";
         private static readonly string buildsPath = string.Concat(Application.dataPath.Remove(Application.dataPath.Length - 6), "Builds/");
 
+        public static string[] Scenes
+        {
+            get
+            {
+                List<string> scenes = new List<string>();
+
+                foreach (var scene in EditorBuildSettings.scenes)
+                {
+                    if (scene.enabled)
+                        scenes.Add(scene.path);
+                }
+
+                return scenes.ToArray();
+            }
+        }
+
         /*************************************************************************************************
         *** Build
         *************************************************************************************************/
         private static BuildReport Build(string buildName, string buildPath, BuildTarget buildTarget, BuildOptions buildOptions, ResolutionDialogSetting resolutionDialogSetting)
         {
-            // Get scenes to build
-            string[] scenes = EditorBuildSettingsScene.GetActiveSceneList(EditorBuildSettings.scenes);
-
-            if (scenes.Length < 1)
+            if (Scenes.Length < 1)
             {
                 Debug.Log(string.Concat(name, "There are no scenes to build. Check your build settings!"));
                 return null;
@@ -54,7 +68,7 @@ namespace UnityEditorTools.Builder
             PlayerSettings.displayResolutionDialog = resolutionDialogSetting;
 
             // Build
-            BuildReport result = BuildPipeline.BuildPlayer(scenes, buildPath, buildTarget, buildOptions);
+            BuildReport result = BuildPipeline.BuildPlayer(Scenes, buildPath, buildTarget, buildOptions);
 
             Debug.Log(string.Concat(name
                                     , "Build completed with a result of '", result.summary.result, "'"

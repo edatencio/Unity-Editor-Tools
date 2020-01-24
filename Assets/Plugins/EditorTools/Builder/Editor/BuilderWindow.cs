@@ -88,21 +88,19 @@ namespace UnityEditorTools.Builder
             {
                 Label("Enabled Scenes in Build", EditorStyles.boldLabel);
 
-                string[] scenes = EditorBuildSettingsScene.GetActiveSceneList(EditorBuildSettings.scenes);
-
                 GUILayoutOption[] options = null;
 
-                if (scenes.Length > 5)
+                if (Builder.Scenes.Length > 5)
                     options = new GUILayoutOption[] { GUILayout.MaxHeight(94f) };
 
                 GUILayout.BeginVertical(EditorStyles.helpBox, options);
                 {
                     scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
                     {
-                        for (int i = 0; i < scenes.Length; i++)
+                        for (int i = 0; i < Builder.Scenes.Length; i++)
                         {
                             GUILayout.BeginHorizontal();
-                            GUILayout.Label(scenes[i].Replace("Assets/", ""));
+                            GUILayout.Label(Builder.Scenes[i].Replace("Assets/", ""));
                             GUILayout.FlexibleSpace();
                             GUILayout.Label(i.ToString());
                             GUILayout.EndHorizontal();
