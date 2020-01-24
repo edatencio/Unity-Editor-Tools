@@ -58,7 +58,7 @@ All the builds are created in the ```Builds``` folder inside your project folder
 
 ## Package Exporter
 
-Whit this tool, you can select a folder and generate a ```.unitypackage``` file with an added readme file; the readme contains the author name, package name, version, and any other additional info editable from the window.
+With this tool, you can select a folder and generate a ```.unitypackage``` file with an added readme file; the readme contains the author name, package name, version, and any other additional info editable from the window.
 
 ![](https://github.com/edatencio/Unity-Editor-Tools/blob/master/Screenshots/Package_Exporter.png)
 
